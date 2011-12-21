@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item
+		android:id="@+id/bold"
+		android:showAsAction="ifRoom|withText"
+		android:title="@string/bold">
+	</item>
+	<item
+		android:id="@+id/italic"
+		android:showAsAction="ifRoom|withText"
+		android:title="@string/italic">
+	</item>
+  <item
+    android:id="@+id/underline"
+    android:title="@string/underline">
+  </item>
+	
+</menu>

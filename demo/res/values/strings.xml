@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string name="hello">Hello World, RichTextEditorDemoActivity!</string>
+	<string name="app_name">RichEditText Demo</string>
+	<string name="app_name2">RichEditText ActionMode</string>
+	<string name="testdata">Improved coverage of <tt>AlarmManager</tt> and <a href='https://github.com/commonsguy/cwac-wakeful'><tt>WakefulIntentService</tt></a></string>
+
+</resources>
