@@ -1,0 +1,54 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:scrollbars="none">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+
+		<ImageButton
+			android:id="@+id/cwac_richedittext_bold"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/bold"
+			android:src="@drawable/bold_off"/>
+
+		<ImageButton
+			android:id="@+id/cwac_richedittext_italic"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/italic"
+			android:src="@drawable/italic_off"/>
+
+		<ImageButton
+			android:id="@+id/cwac_richedittext_underline"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/underline"
+			android:src="@drawable/underline_off"/>
+
+		<ImageButton
+			android:id="@+id/cwac_richedittext_strikethrough"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/strikethrough"
+			android:src="@drawable/strikethrough_off"/>
+
+    <ImageButton
+      android:id="@+id/cwac_richedittext_superscript"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/superscript"
+      android:src="@drawable/superscript_off"/>
+		
+		<ImageButton
+			android:id="@+id/cwac_richedittext_subscript"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/subscript"
+			android:src="@drawable/subscript_off"/>
+	</LinearLayout>
+
+</ScrollView>

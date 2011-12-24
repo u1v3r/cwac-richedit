@@ -33,39 +33,28 @@ public class RichTextEditorDemoActivity extends Activity implements
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    
     setContentView(R.layout.main);
 
-    editor=(RichEditText)findViewById(R.id.editor);
-    editor.setOnSelectionChangedListener(this);
-
-    baseEffects.put((CompoundButton)findViewById(R.id.bold),
-                    RichEditText.BOLD);
-    baseEffects.put((CompoundButton)findViewById(R.id.italic),
-                    RichEditText.ITALIC);
-    baseEffects.put((CompoundButton)findViewById(R.id.underline),
-                    RichEditText.UNDERLINE);
-    baseEffects.put((CompoundButton)findViewById(R.id.strikethrough),
-                    RichEditText.STRIKETHROUGH);
-    baseEffects.put((CompoundButton)findViewById(R.id.normal),
-                    RichEditText.ALIGN_NORMAL);
-    baseEffects.put((CompoundButton)findViewById(R.id.center),
-                    RichEditText.ALIGN_CENTER);
-    baseEffects.put((CompoundButton)findViewById(R.id.opposite),
-                    RichEditText.ALIGN_OPPOSITE);
-    baseEffects.put((CompoundButton)findViewById(R.id.sans),
-                    RichEditText.SANS_SERIF);
-    baseEffects.put((CompoundButton)findViewById(R.id.serif),
-                    RichEditText.SERIF);
-    baseEffects.put((CompoundButton)findViewById(R.id.monospace),
-                    RichEditText.MONOSPACE);
-    baseEffects.put((CompoundButton)findViewById(R.id.superscript),
-                    RichEditText.SUPERSCRIPT);
-    baseEffects.put((CompoundButton)findViewById(R.id.subscript),
-                    RichEditText.SUBSCRIPT);
-
-    for (CompoundButton btn : baseEffects.keySet()) {
-      btn.setOnCheckedChangeListener(this);
-    }
+//    editor=(RichEditText)findViewById(R.id.editor);
+//    editor.setOnSelectionChangedListener(this);
+//
+//    baseEffects.put((CompoundButton)findViewById(R.id.bold),
+//                    RichEditText.BOLD);
+//    baseEffects.put((CompoundButton)findViewById(R.id.italic),
+//                    RichEditText.ITALIC);
+//    baseEffects.put((CompoundButton)findViewById(R.id.underline),
+//                    RichEditText.UNDERLINE);
+//    baseEffects.put((CompoundButton)findViewById(R.id.strikethrough),
+//                    RichEditText.STRIKETHROUGH);
+//    baseEffects.put((CompoundButton)findViewById(R.id.superscript),
+//                    RichEditText.SUPERSCRIPT);
+//    baseEffects.put((CompoundButton)findViewById(R.id.subscript),
+//                    RichEditText.SUBSCRIPT);
+//
+//    for (CompoundButton btn : baseEffects.keySet()) {
+//      btn.setOnCheckedChangeListener(this);
+//    }
   }
 
   @Override

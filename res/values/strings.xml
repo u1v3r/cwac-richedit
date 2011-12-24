@@ -6,5 +6,9 @@
 	<string name="bold">Bold</string>
 	<string name="italic">Italic</string>
 	<string name="underline">Underline</string>
+	<string name="format">FORMAT</string>
+	<string name="strikethrough">STRIKETHROUGH</string>
+	<string name="superscript">SUPERSCRIPT</string>
+	<string name="subscript">SUBSCRIPT</string>
 
 </resources>
