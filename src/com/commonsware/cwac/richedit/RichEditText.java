@@ -10,7 +10,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*/    
+ */
 
 package com.commonsware.cwac.richedit;
 
@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.Build;
-import android.text.Layout.Alignment;
+import android.text.Layout;
 import android.text.style.StrikethroughSpan;
 import android.text.style.SubscriptSpan;
 import android.text.style.SuperscriptSpan;
@@ -45,17 +44,9 @@ public class RichEditText extends EditText {
   public static final Effect<Boolean> UNDERLINE=new UnderlineEffect();
   public static final Effect<Boolean> STRIKETHROUGH=
       new StrikethroughEffect();
-  public static final Effect<Boolean> ALIGN_NORMAL=
-      new LineAlignmentEffect(Alignment.ALIGN_NORMAL);
-  public static final Effect<Boolean> ALIGN_CENTER=
-      new LineAlignmentEffect(Alignment.ALIGN_CENTER);
-  public static final Effect<Boolean> ALIGN_OPPOSITE=
-      new LineAlignmentEffect(Alignment.ALIGN_OPPOSITE);
-  public static final Effect<Boolean> SERIF=new TypefaceEffect("serif");
-  public static final Effect<Boolean> SANS_SERIF=
-      new TypefaceEffect("sans");
-  public static final Effect<Boolean> MONOSPACE=
-      new TypefaceEffect("monospace");
+  public static final Effect<Layout.Alignment> LINE_ALIGNMENT=
+      new LineAlignmentEffect();
+  public static final Effect<String> TYPEFACE=new TypefaceEffect();
   public static final Effect<Boolean> SUPERSCRIPT=
       new SuperscriptEffect();
   public static final Effect<Boolean> SUBSCRIPT=new SubscriptEffect();
@@ -66,19 +57,25 @@ public class RichEditText extends EditText {
   private OnSelectionChangedListener selectionListener=null;
 
   /*
-   * EFFECTS is a roster of all defined effects, for simpler
-   * iteration over all the possibilities.
+   * EFFECTS is a roster of all defined effects, for
+   * simpler iteration over all the possibilities.
    */
   static {
+    /*
+     * Boolean effects
+     */
     EFFECTS.add(BOLD);
     EFFECTS.add(ITALIC);
     EFFECTS.add(UNDERLINE);
-    EFFECTS.add(ALIGN_NORMAL);
-    EFFECTS.add(ALIGN_CENTER);
-    EFFECTS.add(ALIGN_OPPOSITE);
-    EFFECTS.add(SERIF);
-    EFFECTS.add(SANS_SERIF);
-    EFFECTS.add(MONOSPACE);
+    EFFECTS.add(STRIKETHROUGH);
+    EFFECTS.add(SUPERSCRIPT);
+    EFFECTS.add(SUBSCRIPT);
+    
+    /*
+     * Non-Boolean effects
+     */
+    EFFECTS.add(LINE_ALIGNMENT);
+    EFFECTS.add(TYPEFACE);
   }
 
   /*
@@ -98,7 +95,7 @@ public class RichEditText extends EditText {
   }
 
   /*
-   * Standard thred-parameter widget constructor, simply
+   * Standard three-parameter widget constructor, simply
    * chaining to superclass.
    */
   public RichEditText(Context context, AttributeSet attrs, int defStyle) {
@@ -137,20 +134,6 @@ public class RichEditText extends EditText {
       isSelectionChanging=true;
       selectionListener.onSelectionChanged(start, end, effects);
       isSelectionChanging=false;
-    }
-  }
-
-  /*
-   * Call this to enable a built-in action mode on Android
-   * 3.0+, to allow the user to adjust formatting without
-   * the hosting activity needing its own toolbar or
-   * equivalent. This is a no-op on previous versions of
-   * Android, so it is safe to call regardless of Android
-   * version.
-   */
-  public void enableActionMode() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-      setCustomSelectionActionModeCallback(new RichTextActionMode(this));
     }
   }
 

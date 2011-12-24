@@ -10,7 +10,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*/    
+ */
 
 package com.commonsware.cwac.richedit;
 
@@ -22,20 +22,25 @@ public class RelativeSizeEffect extends Effect<Float> {
   boolean existsInSelection(RichEditText editor) {
     Selection selection=new Selection(editor);
     Spannable str=editor.getText();
-    
-    return(getRelativeSizeSpans(str, selection).length>0);
+
+    return(getRelativeSizeSpans(str, selection).length > 0);
   }
 
   @Override
   Float valueInSelection(RichEditText editor) {
     Selection selection=new Selection(editor);
     Spannable str=editor.getText();
+    float max=0.0f;
     RelativeSizeSpan[] spans=getRelativeSizeSpans(str, selection);
 
-    if (spans.length==1) {
-      return(spans[0].getSizeChange());
+    if (spans.length > 0) {
+      for (RelativeSizeSpan span : spans) {
+        max=(max < span.getSizeChange() ? span.getSizeChange() : max);
+      }
+
+      return(max);
     }
-    
+
     return(null);
   }
 
@@ -45,17 +50,17 @@ public class RelativeSizeEffect extends Effect<Float> {
     Spannable str=editor.getText();
 
     for (RelativeSizeSpan span : getRelativeSizeSpans(str, selection)) {
-        str.removeSpan(span);
+      str.removeSpan(span);
     }
 
-    if (proportion!=null) {
+    if (proportion != null) {
       str.setSpan(new RelativeSizeSpan(proportion), selection.start,
                   selection.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
   }
 
   private RelativeSizeSpan[] getRelativeSizeSpans(Spannable str,
-                                          Selection selection) {
+                                                  Selection selection) {
     return(str.getSpans(selection.start, selection.end,
                         RelativeSizeSpan.class));
   }
