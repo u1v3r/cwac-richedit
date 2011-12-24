@@ -10,7 +10,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*/    
+ */
 
 package com.commonsware.cwac.richedit;
 
@@ -28,9 +28,23 @@ public class SimpleBooleanEffect<T> extends Effect<Boolean> {
   boolean existsInSelection(RichEditText editor) {
     Selection selection=new Selection(editor);
     Spannable str=editor.getText();
-    T[] spans=str.getSpans(selection.start, selection.end, clazz);
+    boolean result=false;
 
-    return(spans.length > 0);
+    if (selection.start != selection.end) {
+      T[] spans=str.getSpans(selection.start, selection.end, clazz);
+
+      result=(spans.length > 0);
+    }
+    else {
+      T[] spansBefore=
+          str.getSpans(selection.start - 1, selection.end, clazz);
+      T[] spansAfter=
+          str.getSpans(selection.start, selection.end + 1, clazz);
+
+      result=(spansBefore.length > 0 && spansAfter.length > 0);
+    }
+    
+    return(result);
   }
 
   @Override
