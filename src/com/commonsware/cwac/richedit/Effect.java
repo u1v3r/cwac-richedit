@@ -14,6 +14,15 @@
 
 package com.commonsware.cwac.richedit;
 
+/*
+ * Base class for all effects. An "effect" is a particular
+ * type of styling to apply to the selected text in a
+ * RichEditText. Mostly, these will be wrappers around
+ * the corresponding CharacterStyle classes (e.g., BulletSpan).
+ * The generic type T is the sort of configuration information
+ * that the effect needs -- many will be Effect<Boolean>,
+ * meaning the effect is a toggle (on or off), such as boldface.
+ */
 abstract public class Effect<T> {
   abstract boolean existsInSelection(RichEditText editor);
   abstract T valueInSelection(RichEditText editor);
