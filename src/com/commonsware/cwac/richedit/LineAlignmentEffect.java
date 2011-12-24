@@ -18,46 +18,35 @@ import android.text.Layout;
 import android.text.Spannable;
 import android.text.style.AlignmentSpan;
 
-public class LineAlignmentEffect extends Effect<Boolean> {
-  private Layout.Alignment alignment;
-
-  LineAlignmentEffect(Layout.Alignment alignment) {
-    this.alignment=alignment;
-  }
-
+public class LineAlignmentEffect extends Effect<Layout.Alignment> {
   @Override
   boolean existsInSelection(RichEditText editor) {
+    return(valueInSelection(editor)!=null);
+  }
+
+  @Override
+  Layout.Alignment valueInSelection(RichEditText editor) {
     Selection selection=new Selection(editor);
     Spannable str=editor.getText();
-    boolean result=false;
+    AlignmentSpan.Standard[] spans=getAlignmentSpans(str, selection);
 
-    for (AlignmentSpan.Standard span : getAlignmentSpans(str, selection)) {
-      if (span.getAlignment() == alignment) {
-        result=true;
-        break;
-      }
+    if (spans.length>0) {
+      return(spans[0].getAlignment());
     }
-
-    return(result);
+    
+    return(null);
   }
 
   @Override
-  Boolean valueInSelection(RichEditText editor) {
-    return(existsInSelection(editor));
-  }
-
-  @Override
-  void applyToSelection(RichEditText editor, Boolean add) {
+  void applyToSelection(RichEditText editor, Layout.Alignment alignment) {
     Selection selection=new Selection(editor);
     Spannable str=editor.getText();
 
     for (AlignmentSpan.Standard span : getAlignmentSpans(str, selection)) {
-      if (span.getAlignment() == alignment) {
-        str.removeSpan(span);
-      }
+      str.removeSpan(span);
     }
 
-    if (add) {
+    if (alignment!=null) {
       str.setSpan(new AlignmentSpan.Standard(alignment), selection.start, selection.end,
                   Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
