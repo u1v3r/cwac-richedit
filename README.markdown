@@ -21,15 +21,8 @@ a `demo/` subdirectory containing a regular Android project
 with a couple of activities demonstrating the use of
 `RichEditText`.
 
-**NOTE: THIS IS A HIGHLY EXPERIMENTAL RELEASE.** While some
-rudimentary stuff works, there are many limitations and
-probably more than its fair share of bugs.
-Expect significant revisions of this component, including
-API changes, in the coming weeks and months. That being said,
-you are welcome to try it out and supply feedback.
-
-Usage: RichEditText
--------------------
+Usage
+-----
 Add the project as a library project to your main project.
 Then, simply add `com.commonsware.cwac.richedit.RichEditText`
 widgets to your layout as needed:
@@ -52,7 +45,7 @@ At this time, there are no custom attributes used by
 
 If you use `RichEditText` directly, you will need to have
 your own toolbar or gesture interface or
-whatever to allow users to format text, here are the two key
+whatever to allow users to format text. In that case, here are the two key
 methods to call on `RichEditText`:
 
 - `applyEffect()` changes the current selection, applying
@@ -74,6 +67,12 @@ update your toolbar to indicate what is and is not in use,
 and so you know what to do when the user taps on one of
 those toolbar buttons again.
 
+Alternatively, if you are on API Level 11 or higher, you can call
+`enableActionModes()` on the `RichEditText`. This will add a "FORMAT"
+entry on the action mode that comes up when the user highlights some
+prose in the editor. Tapping that will allow the user to toggle various
+effects. This is significantly simpler than rolling your own toolbar.
+
 ### Supported Effects
 
 At the time of this writing, here are the `RichEditText`
@@ -85,32 +84,11 @@ static data members for each supported effect:
 - `STRIKETHROUGH`
 - `SUPERSCRIPT`
 - `SUBSCRIPT`
+- `TYPEFACE`
 
 There are other effects presently implemented, but they
 will be revised shortly, including name and data type
 changes, so don't mess with them yet.
-
-Usage: RichEditor
------------------
-The downside of `RichEditText` is you have to have the UI to allow
-the user to format the text. Conversely, the `RichEditor` class
-gives you an editing area complete with toolbar to allow the user
-to do the formatting, so you do not have to implement that yourself.
-
-`RichEditor` is a widget, so you can add it to your layouts and
-size/position it as you see fit, once you add the project as a
-library project to your main project:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<com.commonsware.cwac.richedit.RichEditor xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/editor"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"/>
-```
-
-You can call `getEditText()` on your `RichEditor` to get at the
-`RichEditText`, so you can set and retrieve the text itself. 
 
 Dependencies
 ------------
@@ -118,7 +96,7 @@ This project has no dependencies.
 
 Version
 -------
-This is version v0.0.2 of this module, meaning it has all
+This is version v0.0.3 of this module, meaning it has all
 the stability of a sand castle. You have been warned.
 
 Demo
@@ -153,9 +131,6 @@ the fence may work, but it may not.
 
 Release Notes
 -------------
+* v0.0.3: removed `RichEditor`, replaced it with custom action modes
 * v0.0.2: added `RichEditor` and made various fixes
 * v0.0.1: initial release
-
-Acknowledgements
-----------------
-Some of the current icons are derived from the Tango icon library.
