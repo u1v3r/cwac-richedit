@@ -14,11 +14,13 @@
 
 package com.commonsware.cwac.richedit;
 
+import android.widget.EditText;
+
 class Selection {
   int start;
   int end;
 
-  Selection(RichEditText editor) {
+  Selection(EditText editor) {
     start=editor.getSelectionStart();
     end=editor.getSelectionEnd();
 
@@ -31,5 +33,9 @@ class Selection {
 
   boolean isEmpty() {
     return(start == end);
+  }
+  
+  void apply(EditText editor) {
+    editor.setSelection(start, end);
   }
 }

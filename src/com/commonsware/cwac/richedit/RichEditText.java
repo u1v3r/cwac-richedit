@@ -1,5 +1,5 @@
 /***
-  Copyright (c) 2008-2011 CommonsWare, LLC
+  Copyright (c) 2011-2012 CommonsWare, LLC
   
   Licensed under the Apache License, Version 2.0 (the "License"); you may
   not use this file except in compliance with the License. You may obtain
@@ -16,6 +16,7 @@ package com.commonsware.cwac.richedit;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Layout;
@@ -24,6 +25,8 @@ import android.text.style.SubscriptSpan;
 import android.text.style.SuperscriptSpan;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
+import android.view.ActionMode;
+import android.view.MenuItem;
 import android.widget.EditText;
 
 /**
@@ -55,6 +58,10 @@ public class RichEditText extends EditText {
       new ArrayList<Effect<?>>();
   private boolean isSelectionChanging=false;
   private OnSelectionChangedListener selectionListener=null;
+  EditorActionModeCallback entryMode;
+  EditorActionModeCallback mainMode;
+  EditorActionModeCallback effectsMode;
+  EditorActionModeCallback fontsMode;
 
   /*
    * EFFECTS is a roster of all defined effects, for
@@ -192,6 +199,102 @@ public class RichEditText extends EditText {
     if (!isSelectionChanging) {
       effect.applyToSelection(this, !effect.valueInSelection(this));
     }
+  }
+  
+  public void enableActionModes() {
+    entryMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_entry, this) {
+      @Override
+      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        if (item.getItemId()==R.id.cwac_richedittext_format) {
+          chainToNextMode(mainMode);
+          
+          return(true);
+        }
+
+        return(false);
+      }
+    };
+    
+    mainMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_main, this) {
+      @Override
+      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        if (item.getItemId()==R.id.cwac_richedittext_bold) {
+          toggleEffect(RichEditText.BOLD);
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_italic) {
+          toggleEffect(RichEditText.ITALIC);
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_effects) {
+          chainToNextMode(effectsMode);
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_fonts) {
+          chainToNextMode(fontsMode);
+          
+          return(true);
+        }
+
+        return(false);
+      }
+    };
+    
+    effectsMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_effects, this) {
+      @Override
+      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        if (item.getItemId()==R.id.cwac_richedittext_underline) {
+          toggleEffect(RichEditText.UNDERLINE);
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_strike) {
+          toggleEffect(RichEditText.STRIKETHROUGH);
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_superscript) {
+          toggleEffect(RichEditText.SUPERSCRIPT);
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_subscript) {
+          toggleEffect(RichEditText.SUBSCRIPT);
+          
+          return(true);
+        }
+
+        return(false);
+      }
+    };
+    
+    fontsMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_fonts, this) {
+      @Override
+      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        if (item.getItemId()==R.id.cwac_richedittext_serif) {
+          applyEffect(RichEditText.TYPEFACE, "serif");
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_sans) {
+          applyEffect(RichEditText.TYPEFACE, "sans");
+          
+          return(true);
+        }
+        else if (item.getItemId()==R.id.cwac_richedittext_mono) {
+          applyEffect(RichEditText.TYPEFACE, "monospace");
+          
+          return(true);
+        }
+
+        return(false);
+      }
+    };
+    
+    setCustomSelectionActionModeCallback(entryMode);
   }
 
   /*

@@ -14,65 +14,20 @@
 
 package com.commonsware.cwac.richedit.demo;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import com.commonsware.cwac.richedit.Effect;
 import com.commonsware.cwac.richedit.RichEditText;
 
-public class RichTextEditorDemoActivity extends Activity implements
-    OnCheckedChangeListener, RichEditText.OnSelectionChangedListener {
+public class RichTextEditorDemoActivity extends Activity {
   RichEditText editor=null;
-  HashMap<CompoundButton, Effect<Boolean>> baseEffects=
-      new HashMap<CompoundButton, Effect<Boolean>>();
-
+  
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     
     setContentView(R.layout.main);
-
-//    editor=(RichEditText)findViewById(R.id.editor);
-//    editor.setOnSelectionChangedListener(this);
-//
-//    baseEffects.put((CompoundButton)findViewById(R.id.bold),
-//                    RichEditText.BOLD);
-//    baseEffects.put((CompoundButton)findViewById(R.id.italic),
-//                    RichEditText.ITALIC);
-//    baseEffects.put((CompoundButton)findViewById(R.id.underline),
-//                    RichEditText.UNDERLINE);
-//    baseEffects.put((CompoundButton)findViewById(R.id.strikethrough),
-//                    RichEditText.STRIKETHROUGH);
-//    baseEffects.put((CompoundButton)findViewById(R.id.superscript),
-//                    RichEditText.SUPERSCRIPT);
-//    baseEffects.put((CompoundButton)findViewById(R.id.subscript),
-//                    RichEditText.SUBSCRIPT);
-//
-//    for (CompoundButton btn : baseEffects.keySet()) {
-//      btn.setOnCheckedChangeListener(this);
-//    }
-  }
-
-  @Override
-  public void onCheckedChanged(CompoundButton v, boolean checked) {
-    Effect<Boolean> effect=baseEffects.get(v);
     
-    if (effect!=null) {
-      editor.applyEffect(effect, new Boolean(checked));
-    }
-  }
-
-  @Override
-  public void onSelectionChanged(int start, int end,
-                                 List<Effect<?>> effects) {
-    for (Entry<CompoundButton, Effect<Boolean>> entry : baseEffects.entrySet()) {
-      if (effects.contains(entry.getValue())!=entry.getKey().isChecked()) {
-        entry.getKey().toggle();
-      }
-    }
+    editor=(RichEditText)findViewById(R.id.editor);
+    editor.enableActionModes();
   }
 }
