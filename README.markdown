@@ -11,7 +11,7 @@ That's where `RichEditText` comes in.
 
 `RichEditText` is a drop-in replacement for `EditText` that:
 
-- Provides an action mode on Android 3.0+ that allows
+- Provides an action mode on Android 2.1+ that allows
 users to format selected pieces of text
 - Provides convenience methods to allow developers to 
 trigger formatting for selected text via other means
@@ -43,7 +43,26 @@ widgets to your layout as needed:
 At this time, there are no custom attributes used by
 `RichEditText`.
 
-If you use `RichEditText` directly, you will need to have
+On its own, by default, `RichEditText` does not actually provide
+any means for the user to apply various styles (e.g., boldface).
+To do that, you have two choices.
+
+First, you can call
+`enableActionModes()` on the `RichEditText`. This will add a "FORMAT"
+entry on the action mode that comes up when the user highlights some
+prose in the editor. Tapping that will allow the user to toggle various
+effects. This is easy to set up, but there are two significant limitations:
+
+1. If you intend to run on devices prior to API Level 11, you need to be
+using ActionBarSherlock, and your activity hosting the `RichEditText` needs
+to inherit from one of the Sherlock-flavored activiy classes.
+
+2. The action modes do not work especially well on phones at this time &mdash;
+tablets work much better. To get it to work on phones at all, you will need
+to include `android:imeOptions="flagNoExtractUi"` as an attribute on the
+`RichEditText`. Improving this... somehow... is a high-priority item.
+
+Alternatively, you can have
 your own toolbar or gesture interface or
 whatever to allow users to format text. In that case, here are the two key
 methods to call on `RichEditText`:
@@ -56,7 +75,7 @@ effects take boolean values, so `applyEffect(RichEditText.BOLD, true)`
 would format the current selection as bold.
 
 - `setOnSelectionChangedListener()` is where you register a
-RichEditText.OnSelectionChangedListener object, which will
+`RichEditText.OnSelectionChangedListener` object, which will
 be called with `onSelectionChanged()` whenever the user changes
 the selection in the widget (i.e., highlights text or taps
 to un-select the highlight). You are provided the start and
@@ -66,12 +85,6 @@ that are active on that selection. This will allow you to
 update your toolbar to indicate what is and is not in use,
 and so you know what to do when the user taps on one of
 those toolbar buttons again.
-
-Alternatively, if you are on API Level 11 or higher, you can call
-`enableActionModes()` on the `RichEditText`. This will add a "FORMAT"
-entry on the action mode that comes up when the user highlights some
-prose in the editor. Tapping that will allow the user to toggle various
-effects. This is significantly simpler than rolling your own toolbar.
 
 ### Supported Effects
 
@@ -92,12 +105,16 @@ changes, so don't mess with them yet.
 
 Dependencies
 ------------
-This project has no dependencies.
+This project depends upon [ActionBarSherlock](http://actionbarsherlock.com).
+If you check out this project, you will need to update your local configuration
+to point to your own copy of ActionBarSherlock.
+
+(as the world patiently awaits Android library projects being able to be
+packaged as JARs...)
 
 Version
 -------
-This is version v0.0.3 of this module, meaning it has all
-the stability of a sand castle. You have been warned.
+This is version v0.1 of this module, meaning it is really a n00b.
 
 Demo
 ----
@@ -117,7 +134,7 @@ on [StackOverflow](http://stackoverflow.com/questions/ask) tagged with `commonsw
 what CWAC module you are having issues with, and be sure to include source code 
 and stack traces if you are encountering crashes.
 
-If you have encountered what is clearly a bug, or a feature request,
+If you have encountered what is clearly a bug, or if you have a feature request,
 please post an [issue](https://github.com/commonsguy/cwac-richedit/issues).
 Be certain to include complete steps for reproducing the issue.
 
@@ -131,6 +148,7 @@ the fence may work, but it may not.
 
 Release Notes
 -------------
-* v0.0.3: removed `RichEditor`, replaced it with custom action modes
-* v0.0.2: added `RichEditor` and made various fixes
-* v0.0.1: initial release
+- v0.1: added action mode support using ActionBarSherlock for pre-Honeycomb devices
+- v0.0.3: removed `RichEditor`, replaced it with custom action modes
+- v0.0.2: added `RichEditor` and made various fixes
+- v0.0.1: initial release
