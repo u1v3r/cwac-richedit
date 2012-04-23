@@ -148,6 +148,7 @@ the fence may work, but it may not.
 
 Release Notes
 -------------
+- v0.1.1: added `disableActionModes()` and fixed bug related to conditional action mode usage
 - v0.1: added action mode support using ActionBarSherlock for pre-Honeycomb devices
 - v0.0.3: removed `RichEditor`, replaced it with custom action modes
 - v0.0.2: added `RichEditor` and made various fixes
