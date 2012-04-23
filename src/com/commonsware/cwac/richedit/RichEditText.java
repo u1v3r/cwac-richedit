@@ -158,14 +158,16 @@ public class RichEditText extends EditText implements
       }
     }
     else {
-      if (start == end) {
-        if (sherlockActionMode != null) {
-          sherlockActionMode.finish();
-          sherlockActionMode=null;
+      if (sherlockEntryMode!=null) {
+        if (start == end) {
+          if (sherlockActionMode != null) {
+            sherlockActionMode.finish();
+            sherlockActionMode=null;
+          }
         }
-      }
-      else {
-        showSherlockEntryMode();
+        else {
+          showSherlockEntryMode();
+        }
       }
     }
   }
@@ -314,6 +316,16 @@ public class RichEditText extends EditText implements
     }
     else {
       enableSherlockActionModes();
+    }
+  }
+  
+  public void disableActionModes() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+      setCustomSelectionActionModeCallback(null);
+      mainMode=null;
+    }
+    else {
+      sherlockEntryMode=null;
     }
   }
 
