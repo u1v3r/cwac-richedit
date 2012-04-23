@@ -6,14 +6,18 @@
 	<string name="bold">Bold</string>
 	<string name="italic">Italic</string>
 	<string name="underline">Underline</string>
-	<string name="strikethrough">STRIKETHROUGH</string>
-	<string name="superscript">SUPERSCRIPT</string>
-	<string name="subscript">SUBSCRIPT</string>
+	<string name="strikethrough">Strikethrough</string>
+	<string name="superscript">Superscript</string>
+	<string name="subscript">Subscript</string>
 	<string name="sans">Sans Serif</string>
 	<string name="serif">Serif</string>
 	<string name="mono">Monospace</string>
 	<string name="effects">Effects</string>
 	<string name="fonts">Fonts</string>
 	<string name="format">Format</string>
+	<string name="lines">Lines</string>
+	<string name="normal">Normal</string>
+	<string name="center">Center</string>
+	<string name="opposite">Opposite</string>
 
 </resources>

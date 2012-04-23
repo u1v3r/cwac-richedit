@@ -14,54 +14,149 @@
 
 package com.commonsware.cwac.richedit;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import android.app.Activity;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.widget.EditText;
+import android.view.MenuItem;
 
-abstract public class EditorActionModeCallback implements
-    ActionMode.Callback {
-  int menuResource=0;
-  EditText editor=null;
-  Selection selection=null;
-  Activity host=null;
-
-  public EditorActionModeCallback(Activity host, int menuResource,
-                                  RichEditText editor) {
-    this.host=host;
+public class EditorActionModeCallback {
+  protected int menuResource=0;
+  protected RichEditText editor=null;
+  protected Selection selection=null;
+  protected EditorActionModeListener listener=null;
+  protected HashMap<Integer, EditorActionModeCallback> chains=
+      new HashMap<Integer, EditorActionModeCallback>();
+  
+  EditorActionModeCallback(int menuResource, RichEditText editor, EditorActionModeListener listener) {
     this.menuResource=menuResource;
     this.editor=editor;
-  }
-
-  @Override
-  public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-    MenuInflater inflater=mode.getMenuInflater();
-
-    inflater.inflate(menuResource, menu);
-
-    return(true);
-  }
-
-  @Override
-  public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-    if (selection != null) {
-      selection.apply(editor);
-    }
-
-    return(false);
-  }
-
-  @Override
-  public void onDestroyActionMode(ActionMode mode) {
+    this.listener=listener;
   }
 
   void setSelection(Selection selection) {
     this.selection=selection;
   }
+  
+  void addChain(int menuItemId, EditorActionModeCallback toChainTo) {
+    chains.put(menuItemId, toChainTo);
+  }
 
-  protected void chainToNextMode(EditorActionModeCallback next) {
-    next.setSelection(new Selection(editor));
-    host.startActionMode(next);
+  public static class Native extends EditorActionModeCallback
+      implements ActionMode.Callback {
+    Activity host=null;
+
+    public Native(Activity host, int menuResource, RichEditText editor, EditorActionModeListener listener) {
+      super(menuResource, editor, listener);
+      this.host=host;
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+      MenuInflater inflater=mode.getMenuInflater();
+
+      inflater.inflate(menuResource, menu);
+      listener.setIsShowing(true);
+
+      return(true);
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+      if (selection != null) {
+        selection.apply(editor);
+      }
+
+      return(false);
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+      listener.setIsShowing(false);
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+      EditorActionModeCallback next=chains.get(item.getItemId());
+      
+      if (next!=null) {
+        next.setSelection(new Selection(editor));
+        host.startActionMode((EditorActionModeCallback.Native)next);
+        
+        return(true);
+      }
+      
+      return(listener.doAction(item.getItemId()));
+    }
+  }
+
+  public static class ABS extends EditorActionModeCallback
+      implements com.actionbarsherlock.view.ActionMode.Callback {
+    Activity host=null;
+
+    public ABS(Activity host, int menuResource,
+               RichEditText editor, EditorActionModeListener listener) {
+      super(menuResource, editor, listener);
+      this.host=host;
+    }
+
+    @Override
+    public boolean onCreateActionMode(com.actionbarsherlock.view.ActionMode mode,
+                                      com.actionbarsherlock.view.Menu menu) {
+      com.actionbarsherlock.view.MenuInflater inflater=
+          mode.getMenuInflater();
+
+      inflater.inflate(menuResource, menu);
+      listener.setIsShowing(true);
+
+      return(true);
+    }
+
+    @Override
+    public boolean onPrepareActionMode(com.actionbarsherlock.view.ActionMode mode,
+                                       com.actionbarsherlock.view.Menu menu) {
+      if (selection != null) {
+        selection.apply(editor);
+      }
+      
+      return(false);
+    }
+
+    @Override
+    public void onDestroyActionMode(com.actionbarsherlock.view.ActionMode mode) {
+      listener.setIsShowing(false);
+    }
+
+    @Override
+    public boolean onActionItemClicked(com.actionbarsherlock.view.ActionMode mode,
+                                       com.actionbarsherlock.view.MenuItem item) {
+      EditorActionModeCallback next=chains.get(item.getItemId());
+      
+      if (next!=null) {
+        next.setSelection(new Selection(editor));
+        
+        // nasty reflection hack to get around the fact
+        // that there is no inheritance hierarchy for
+        // Sherlock*Activity
+        
+        Method method;
+        try {
+          method=host.getClass().getMethod("startActionMode", com.actionbarsherlock.view.ActionMode.Callback.class);
+          method.invoke(host, next);
+        }
+        catch (Exception e) {
+          Log.e(getClass().getSimpleName(), "Exception starting action mode", e);
+        }
+        
+//        host.startActionMode((EditorActionModeCallback.ABS)next);
+        
+        return(true);
+      }
+      
+      return(listener.doAction(item.getItemId()));
+    }
   }
 }

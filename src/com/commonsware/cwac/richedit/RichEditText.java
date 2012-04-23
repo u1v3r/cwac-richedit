@@ -14,19 +14,20 @@
 
 package com.commonsware.cwac.richedit;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.text.Layout;
 import android.text.style.StrikethroughSpan;
 import android.text.style.SubscriptSpan;
 import android.text.style.SuperscriptSpan;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
-import android.view.ActionMode;
-import android.view.MenuItem;
+import android.util.Log;
 import android.widget.EditText;
 
 /**
@@ -39,7 +40,8 @@ import android.widget.EditText;
  * http://code.google.com/p/droid-writer
  * 
  */
-public class RichEditText extends EditText {
+public class RichEditText extends EditText implements
+    EditorActionModeListener {
   public static final Effect<Boolean> BOLD=
       new StyleEffect(Typeface.BOLD);
   public static final Effect<Boolean> ITALIC=
@@ -58,14 +60,15 @@ public class RichEditText extends EditText {
       new ArrayList<Effect<?>>();
   private boolean isSelectionChanging=false;
   private OnSelectionChangedListener selectionListener=null;
-  EditorActionModeCallback entryMode;
-  EditorActionModeCallback mainMode;
-  EditorActionModeCallback effectsMode;
-  EditorActionModeCallback fontsMode;
+  private boolean actionModeIsShowing=false;
+  private EditorActionModeCallback.Native mainMode=null;
+  private EditorActionModeCallback.ABS sherlockEntryMode=null;
+  private boolean forceActionMode=false;
+  private com.actionbarsherlock.view.ActionMode sherlockActionMode=null;
 
   /*
-   * EFFECTS is a roster of all defined effects, for
-   * simpler iteration over all the possibilities.
+   * EFFECTS is a roster of all defined effects, for simpler
+   * iteration over all the possibilities.
    */
   static {
     /*
@@ -77,7 +80,7 @@ public class RichEditText extends EditText {
     EFFECTS.add(STRIKETHROUGH);
     EFFECTS.add(SUPERSCRIPT);
     EFFECTS.add(SUBSCRIPT);
-    
+
     /*
      * Non-Boolean effects
      */
@@ -142,6 +145,29 @@ public class RichEditText extends EditText {
       selectionListener.onSelectionChanged(start, end, effects);
       isSelectionChanging=false;
     }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+      if (forceActionMode && mainMode != null && start != end) {
+        postDelayed(new Runnable() {
+          public void run() {
+            if (!actionModeIsShowing) {
+              startActionMode(mainMode);
+            }
+          }
+        }, 500);
+      }
+    }
+    else {
+      if (start == end) {
+        if (sherlockActionMode != null) {
+          sherlockActionMode.finish();
+          sherlockActionMode=null;
+        }
+      }
+      else {
+        showSherlockEntryMode();
+      }
+    }
   }
 
   /*
@@ -200,101 +226,198 @@ public class RichEditText extends EditText {
       effect.applyToSelection(this, !effect.valueInSelection(this));
     }
   }
-  
-  public void enableActionModes() {
-    entryMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_entry, this) {
-      @Override
-      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        if (item.getItemId()==R.id.cwac_richedittext_format) {
-          chainToNextMode(mainMode);
-          
-          return(true);
-        }
 
-        return(false);
-      }
-    };
-    
-    mainMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_main, this) {
-      @Override
-      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        if (item.getItemId()==R.id.cwac_richedittext_bold) {
-          toggleEffect(RichEditText.BOLD);
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_italic) {
-          toggleEffect(RichEditText.ITALIC);
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_effects) {
-          chainToNextMode(effectsMode);
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_fonts) {
-          chainToNextMode(fontsMode);
-          
-          return(true);
-        }
+  @Override
+  public boolean doAction(int itemId) {
+    if (itemId == R.id.cwac_richedittext_underline) {
+      toggleEffect(RichEditText.UNDERLINE);
 
-        return(false);
-      }
-    };
-    
-    effectsMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_effects, this) {
-      @Override
-      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        if (item.getItemId()==R.id.cwac_richedittext_underline) {
-          toggleEffect(RichEditText.UNDERLINE);
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_strike) {
-          toggleEffect(RichEditText.STRIKETHROUGH);
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_superscript) {
-          toggleEffect(RichEditText.SUPERSCRIPT);
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_subscript) {
-          toggleEffect(RichEditText.SUBSCRIPT);
-          
-          return(true);
-        }
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_strike) {
+      toggleEffect(RichEditText.STRIKETHROUGH);
 
-        return(false);
-      }
-    };
-    
-    fontsMode=new EditorActionModeCallback((Activity)getContext(), R.menu.cwac_richedittext_fonts, this) {
-      @Override
-      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        if (item.getItemId()==R.id.cwac_richedittext_serif) {
-          applyEffect(RichEditText.TYPEFACE, "serif");
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_sans) {
-          applyEffect(RichEditText.TYPEFACE, "sans");
-          
-          return(true);
-        }
-        else if (item.getItemId()==R.id.cwac_richedittext_mono) {
-          applyEffect(RichEditText.TYPEFACE, "monospace");
-          
-          return(true);
-        }
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_superscript) {
+      toggleEffect(RichEditText.SUPERSCRIPT);
 
-        return(false);
-      }
-    };
-    
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_subscript) {
+      toggleEffect(RichEditText.SUBSCRIPT);
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_serif) {
+      applyEffect(RichEditText.TYPEFACE, "serif");
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_sans) {
+      applyEffect(RichEditText.TYPEFACE, "sans");
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_mono) {
+      applyEffect(RichEditText.TYPEFACE, "monospace");
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_normal) {
+      applyEffect(RichEditText.LINE_ALIGNMENT,
+                  Layout.Alignment.ALIGN_NORMAL);
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_center) {
+      applyEffect(RichEditText.LINE_ALIGNMENT,
+                  Layout.Alignment.ALIGN_CENTER);
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_opposite) {
+      applyEffect(RichEditText.LINE_ALIGNMENT,
+                  Layout.Alignment.ALIGN_OPPOSITE);
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_bold) {
+      toggleEffect(RichEditText.BOLD);
+
+      return(true);
+    }
+    else if (itemId == R.id.cwac_richedittext_italic) {
+      toggleEffect(RichEditText.ITALIC);
+
+      return(true);
+    }
+    else if (itemId == android.R.id.selectAll
+        || itemId == android.R.id.cut || itemId == android.R.id.copy
+        || itemId == android.R.id.paste) {
+      onTextContextMenuItem(itemId);
+    }
+
+    return(false);
+  }
+
+  @Override
+  public void setIsShowing(boolean isShowing) {
+    actionModeIsShowing=isShowing;
+  }
+
+  public void enableActionModes(boolean forceActionMode) {
+    this.forceActionMode=forceActionMode;
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+      enableNativeActionModes();
+    }
+    else {
+      enableSherlockActionModes();
+    }
+  }
+
+  private void enableNativeActionModes() {
+    EditorActionModeCallback.Native effectsMode=
+        new EditorActionModeCallback.Native(
+                                            (Activity)getContext(),
+                                            R.menu.cwac_richedittext_effects,
+                                            this, this);
+
+    EditorActionModeCallback.Native fontsMode=
+        new EditorActionModeCallback.Native(
+                                            (Activity)getContext(),
+                                            R.menu.cwac_richedittext_fonts,
+                                            this, this);
+
+    // EditorActionModeCallback.Native linesMode=
+    // new EditorActionModeCallback.Native(
+    // (Activity)getContext(),
+    // R.menu.cwac_richedittext_lines,
+    // this, this);
+
+    mainMode=
+        new EditorActionModeCallback.Native(
+                                            (Activity)getContext(),
+                                            R.menu.cwac_richedittext_main,
+                                            this, this);
+
+    mainMode.addChain(R.id.cwac_richedittext_effects, effectsMode);
+    mainMode.addChain(R.id.cwac_richedittext_fonts, fontsMode);
+    // mainMode.addChain(R.id.cwac_richedittext_lines,
+    // linesMode);
+
+    EditorActionModeCallback.Native entryMode=
+        new EditorActionModeCallback.Native(
+                                            (Activity)getContext(),
+                                            R.menu.cwac_richedittext_entry,
+                                            this, this);
+
+    entryMode.addChain(R.id.cwac_richedittext_format, mainMode);
     setCustomSelectionActionModeCallback(entryMode);
+  }
+
+  private void enableSherlockActionModes() {
+    EditorActionModeCallback effectsMode=
+        new EditorActionModeCallback.ABS(
+                                         (Activity)getContext(),
+                                         R.menu.cwac_richedittext_effects,
+                                         this, this);
+
+    EditorActionModeCallback fontsMode=
+        new EditorActionModeCallback.ABS(
+                                         (Activity)getContext(),
+                                         R.menu.cwac_richedittext_fonts,
+                                         this, this);
+
+    // EditorActionModeCallback linesMode=
+    // new EditorActionModeCallback.ABS(
+    // (Activity)getContext(),
+    // R.menu.cwac_richedittext_lines,
+    // this, this);
+
+    EditorActionModeCallback sherlockMainMode=
+        new EditorActionModeCallback.ABS((Activity)getContext(),
+                                         R.menu.cwac_richedittext_main,
+                                         this, this);
+
+    sherlockMainMode.addChain(R.id.cwac_richedittext_effects,
+                              effectsMode);
+    sherlockMainMode.addChain(R.id.cwac_richedittext_fonts, fontsMode);
+    // sherlockMainMode.addChain(R.id.cwac_richedittext_lines,
+    // linesMode);
+
+    sherlockEntryMode=
+        new EditorActionModeCallback.ABS(
+                                         (Activity)getContext(),
+                                         R.menu.cwac_richedittext_entry,
+                                         this, this);
+
+    sherlockEntryMode.addChain(R.id.cwac_richedittext_format,
+                               sherlockMainMode);
+  }
+
+  private void showSherlockEntryMode() {
+    if (!actionModeIsShowing) {
+      // nasty reflection hack to get around the fact
+      // that there is no inheritance hierarchy for
+      // Sherlock*Activity
+
+      Method method;
+      try {
+        method=
+            getContext().getClass()
+                        .getMethod("startActionMode",
+                                   com.actionbarsherlock.view.ActionMode.Callback.class);
+        sherlockActionMode=
+            (com.actionbarsherlock.view.ActionMode)method.invoke(getContext(),
+                                                                 sherlockEntryMode);
+      }
+      catch (Exception e) {
+        Log.e(getClass().getSimpleName(),
+              "Exception starting action mode", e);
+      }
+    }
   }
 
   /*

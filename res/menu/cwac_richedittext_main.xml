@@ -21,5 +21,10 @@
 		android:showAsAction="always|withText"
 		android:title="@string/fonts">
 	</item>
-
+<!--   <item -->
+<!--     android:id="@+id/cwac_richedittext_lines" -->
+<!--     android:showAsAction="always|withText" -->
+<!--     android:title="@string/lines"> -->
+<!--   </item> -->
+	
 </menu>
