@@ -342,12 +342,6 @@ public class RichEditText extends EditText implements
                                             R.menu.cwac_richedittext_fonts,
                                             this, this);
 
-    // EditorActionModeCallback.Native linesMode=
-    // new EditorActionModeCallback.Native(
-    // (Activity)getContext(),
-    // R.menu.cwac_richedittext_lines,
-    // this, this);
-
     mainMode=
         new EditorActionModeCallback.Native(
                                             (Activity)getContext(),
@@ -356,8 +350,6 @@ public class RichEditText extends EditText implements
 
     mainMode.addChain(R.id.cwac_richedittext_effects, effectsMode);
     mainMode.addChain(R.id.cwac_richedittext_fonts, fontsMode);
-    // mainMode.addChain(R.id.cwac_richedittext_lines,
-    // linesMode);
 
     EditorActionModeCallback.Native entryMode=
         new EditorActionModeCallback.Native(
@@ -382,12 +374,6 @@ public class RichEditText extends EditText implements
                                          R.menu.cwac_richedittext_fonts,
                                          this, this);
 
-    // EditorActionModeCallback linesMode=
-    // new EditorActionModeCallback.ABS(
-    // (Activity)getContext(),
-    // R.menu.cwac_richedittext_lines,
-    // this, this);
-
     EditorActionModeCallback sherlockMainMode=
         new EditorActionModeCallback.ABS((Activity)getContext(),
                                          R.menu.cwac_richedittext_main,
@@ -396,8 +382,6 @@ public class RichEditText extends EditText implements
     sherlockMainMode.addChain(R.id.cwac_richedittext_effects,
                               effectsMode);
     sherlockMainMode.addChain(R.id.cwac_richedittext_fonts, fontsMode);
-    // sherlockMainMode.addChain(R.id.cwac_richedittext_lines,
-    // linesMode);
 
     sherlockEntryMode=
         new EditorActionModeCallback.ABS(
