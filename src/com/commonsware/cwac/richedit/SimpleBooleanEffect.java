@@ -43,7 +43,7 @@ public class SimpleBooleanEffect<T> extends Effect<Boolean> {
 
       result=(spansBefore.length > 0 && spansAfter.length > 0);
     }
-    
+
     return(result);
   }
 
@@ -54,27 +54,55 @@ public class SimpleBooleanEffect<T> extends Effect<Boolean> {
 
   @Override
   void applyToSelection(RichEditText editor, Boolean add) {
-    Selection selection=new Selection(editor);
-    Spannable str=editor.getText();
+    applyToSpannable(editor.getText(), new Selection(editor), add);
+  }
+
+  void applyToSpannable(Spannable str, Selection selection, Boolean add) {
     T[] spans=str.getSpans(selection.start, selection.end, clazz);
+    int prologueStart=Integer.MAX_VALUE;
+    int epilogueEnd=-1;
 
     for (T span : spans) {
+      int spanStart=str.getSpanStart(span);
+
+      if (spanStart < selection.start) {
+        prologueStart=Math.min(prologueStart, spanStart);
+      }
+
+      int spanEnd=str.getSpanEnd(span);
+
+      if (spanEnd > selection.end) {
+        epilogueEnd=Math.max(epilogueEnd, spanEnd);
+      }
+
       str.removeSpan(span);
     }
 
-    if (add) {
-      try {
+    try {
+      if (add) {
         str.setSpan(clazz.newInstance(), selection.start,
                     selection.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
       }
-      catch (IllegalAccessException e) {
-        Log.e("RichEditText",
-              "Exception instantiating " + clazz.toString(), e);
+      else {
+        if (prologueStart < Integer.MAX_VALUE) {
+          str.setSpan(clazz.newInstance(), prologueStart,
+                      selection.start,
+                      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
+        if (epilogueEnd > -1) {
+          str.setSpan(clazz.newInstance(), selection.end,
+                      epilogueEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
       }
-      catch (InstantiationException e) {
-        Log.e("RichEditText",
-              "Exception instantiating " + clazz.toString(), e);
-      }
+    }
+    catch (IllegalAccessException e) {
+      Log.e("RichEditText",
+            "Exception instantiating " + clazz.toString(), e);
+    }
+    catch (InstantiationException e) {
+      Log.e("RichEditText",
+            "Exception instantiating " + clazz.toString(), e);
     }
   }
 }

@@ -10,7 +10,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*/    
+ */
 
 package com.commonsware.cwac.richedit;
 
@@ -40,9 +40,11 @@ public class StyleEffect extends Effect<Boolean> {
     }
     else {
       StyleSpan[] spansBefore=
-          str.getSpans(selection.start - 1, selection.end, StyleSpan.class);
+          str.getSpans(selection.start - 1, selection.end,
+                       StyleSpan.class);
       StyleSpan[] spansAfter=
-          str.getSpans(selection.start, selection.end + 1, StyleSpan.class);
+          str.getSpans(selection.start, selection.end + 1,
+                       StyleSpan.class);
 
       for (StyleSpan span : spansBefore) {
         if (span.getStyle() == style) {
@@ -50,10 +52,10 @@ public class StyleEffect extends Effect<Boolean> {
           break;
         }
       }
-      
+
       if (result) {
         result=false;
-        
+
         for (StyleSpan span : spansAfter) {
           if (span.getStyle() == style) {
             result=true;
@@ -62,7 +64,7 @@ public class StyleEffect extends Effect<Boolean> {
         }
       }
     }
-    
+
     return(result);
   }
 
@@ -73,11 +75,27 @@ public class StyleEffect extends Effect<Boolean> {
 
   @Override
   void applyToSelection(RichEditText editor, Boolean add) {
-    Selection selection=new Selection(editor);
-    Spannable str=editor.getText();
+    applyToSpannable(editor.getText(), new Selection(editor), add);
+  }
+
+  void applyToSpannable(Spannable str, Selection selection, Boolean add) {
+    int prologueStart=Integer.MAX_VALUE;
+    int epilogueEnd=-1;
 
     for (StyleSpan span : getStyleSpans(str, selection)) {
       if (span.getStyle() == style) {
+        int spanStart=str.getSpanStart(span);
+
+        if (spanStart < selection.start) {
+          prologueStart=Math.min(prologueStart, spanStart);
+        }
+
+        int spanEnd=str.getSpanEnd(span);
+
+        if (spanEnd > selection.end) {
+          epilogueEnd=Math.max(epilogueEnd, spanEnd);
+        }
+
         str.removeSpan(span);
       }
     }
@@ -85,6 +103,17 @@ public class StyleEffect extends Effect<Boolean> {
     if (add) {
       str.setSpan(new StyleSpan(style), selection.start, selection.end,
                   Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+    else {
+      if (prologueStart < Integer.MAX_VALUE) {
+        str.setSpan(new StyleSpan(style), prologueStart,
+                    selection.start, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+      }
+
+      if (epilogueEnd > -1) {
+        str.setSpan(new StyleSpan(style), selection.end, epilogueEnd,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+      }
     }
   }
 
