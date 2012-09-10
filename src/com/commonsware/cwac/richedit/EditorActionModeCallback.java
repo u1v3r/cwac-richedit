@@ -16,6 +16,7 @@ package com.commonsware.cwac.richedit;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.util.Log;
 import android.view.ActionMode;
@@ -30,8 +31,9 @@ public class EditorActionModeCallback {
   protected EditorActionModeListener listener=null;
   protected HashMap<Integer, EditorActionModeCallback> chains=
       new HashMap<Integer, EditorActionModeCallback>();
-  
-  EditorActionModeCallback(int menuResource, RichEditText editor, EditorActionModeListener listener) {
+
+  EditorActionModeCallback(int menuResource, RichEditText editor,
+                           EditorActionModeListener listener) {
     this.menuResource=menuResource;
     this.editor=editor;
     this.listener=listener;
@@ -40,16 +42,18 @@ public class EditorActionModeCallback {
   void setSelection(Selection selection) {
     this.selection=selection;
   }
-  
+
   void addChain(int menuItemId, EditorActionModeCallback toChainTo) {
     chains.put(menuItemId, toChainTo);
   }
 
-  public static class Native extends EditorActionModeCallback
-      implements ActionMode.Callback {
+  @TargetApi(11)
+  public static class Native extends EditorActionModeCallback implements
+      ActionMode.Callback {
     Activity host=null;
 
-    public Native(Activity host, int menuResource, RichEditText editor, EditorActionModeListener listener) {
+    public Native(Activity host, int menuResource, RichEditText editor,
+                  EditorActionModeListener listener) {
       super(menuResource, editor, listener);
       this.host=host;
     }
@@ -81,24 +85,27 @@ public class EditorActionModeCallback {
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
       EditorActionModeCallback next=chains.get(item.getItemId());
-      
-      if (next!=null) {
+
+      if (next != null) {
         next.setSelection(new Selection(editor));
         host.startActionMode((EditorActionModeCallback.Native)next);
-        
+        mode.finish();
+
         return(true);
       }
       
+      mode.finish();
+
       return(listener.doAction(item.getItemId()));
     }
   }
 
-  public static class ABS extends EditorActionModeCallback
-      implements com.actionbarsherlock.view.ActionMode.Callback {
+  public static class ABS extends EditorActionModeCallback implements
+      com.actionbarsherlock.view.ActionMode.Callback {
     Activity host=null;
 
-    public ABS(Activity host, int menuResource,
-               RichEditText editor, EditorActionModeListener listener) {
+    public ABS(Activity host, int menuResource, RichEditText editor,
+               EditorActionModeListener listener) {
       super(menuResource, editor, listener);
       this.host=host;
     }
@@ -121,7 +128,7 @@ public class EditorActionModeCallback {
       if (selection != null) {
         selection.apply(editor);
       }
-      
+
       return(false);
     }
 
@@ -134,28 +141,35 @@ public class EditorActionModeCallback {
     public boolean onActionItemClicked(com.actionbarsherlock.view.ActionMode mode,
                                        com.actionbarsherlock.view.MenuItem item) {
       EditorActionModeCallback next=chains.get(item.getItemId());
-      
-      if (next!=null) {
+
+      if (next != null) {
         next.setSelection(new Selection(editor));
-        
+
         // nasty reflection hack to get around the fact
         // that there is no inheritance hierarchy for
         // Sherlock*Activity
-        
+
         Method method;
         try {
-          method=host.getClass().getMethod("startActionMode", com.actionbarsherlock.view.ActionMode.Callback.class);
+          method=
+              host.getClass()
+                  .getMethod("startActionMode",
+                             com.actionbarsherlock.view.ActionMode.Callback.class);
           method.invoke(host, next);
         }
         catch (Exception e) {
-          Log.e(getClass().getSimpleName(), "Exception starting action mode", e);
+          Log.e(getClass().getSimpleName(),
+                "Exception starting action mode", e);
         }
-        
-//        host.startActionMode((EditorActionModeCallback.ABS)next);
-        
+
+        // host.startActionMode((EditorActionModeCallback.ABS)next);
+        mode.finish();
+
         return(true);
       }
       
+      mode.finish();
+
       return(listener.doAction(item.getItemId()));
     }
   }
