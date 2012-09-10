@@ -10,7 +10,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*/    
+ */
 
 package com.commonsware.cwac.richedit;
 
@@ -20,9 +20,9 @@ class Selection {
   int start;
   int end;
 
-  Selection(EditText editor) {
-    start=editor.getSelectionStart();
-    end=editor.getSelectionEnd();
+  Selection(int _start, int _end) {
+    start=_start;
+    end=_end;
 
     if (start > end) {
       int temp=end;
@@ -31,10 +31,14 @@ class Selection {
     }
   }
 
+  Selection(EditText editor) {
+    this(editor.getSelectionStart(), editor.getSelectionEnd());
+  }
+
   boolean isEmpty() {
     return(start == end);
   }
-  
+
   void apply(EditText editor) {
     editor.setSelection(start, end);
   }
