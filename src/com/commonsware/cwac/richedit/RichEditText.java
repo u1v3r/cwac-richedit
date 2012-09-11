@@ -14,9 +14,7 @@
 
 package com.commonsware.cwac.richedit;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
@@ -28,7 +26,11 @@ import android.text.style.SuperscriptSpan;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.EditText;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Custom widget that simplifies adding rich text editing
@@ -65,6 +67,7 @@ public class RichEditText extends EditText implements
   private EditorActionModeCallback.ABS sherlockEntryMode=null;
   private boolean forceActionMode=false;
   private com.actionbarsherlock.view.ActionMode sherlockActionMode=null;
+  private boolean keyboardShortcuts=true;
 
   /*
    * EFFECTS is a roster of all defined effects, for simpler
@@ -158,7 +161,7 @@ public class RichEditText extends EditText implements
       }
     }
     else {
-      if (sherlockEntryMode!=null) {
+      if (sherlockEntryMode != null) {
         if (start == end) {
           if (sherlockActionMode != null) {
             sherlockActionMode.finish();
@@ -172,6 +175,33 @@ public class RichEditText extends EditText implements
     }
   }
 
+  @TargetApi(11)
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (keyboardShortcuts
+        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+      if (event.isCtrlPressed()) {
+        if (keyCode == KeyEvent.KEYCODE_B) {
+          toggleEffect(RichEditText.BOLD);
+
+          return(true);
+        }
+        else if (keyCode == KeyEvent.KEYCODE_I) {
+          toggleEffect(RichEditText.ITALIC);
+
+          return(true);
+        }
+        else if (keyCode == KeyEvent.KEYCODE_U) {
+          toggleEffect(RichEditText.UNDERLINE);
+
+          return(true);
+        }
+      }
+    }
+
+    return(super.onKeyUp(keyCode, event));
+  }
+
   /*
    * Call this to provide a listener object to be notified
    * when the selection changes and what the applied effects
@@ -181,6 +211,14 @@ public class RichEditText extends EditText implements
    */
   public void setOnSelectionChangedListener(OnSelectionChangedListener selectionListener) {
     this.selectionListener=selectionListener;
+  }
+
+  /*
+   * Call this to enable or disable handling of keyboard
+   * shortcuts (e.g., Ctrl-B for bold). Enabled by default.
+   */
+  public void setKeyboardShortcutsEnabled(boolean keyboardShortcuts) {
+    this.keyboardShortcuts=keyboardShortcuts;
   }
 
   /*
@@ -318,7 +356,8 @@ public class RichEditText extends EditText implements
       enableSherlockActionModes();
     }
   }
-  
+
+  @TargetApi(11)
   public void disableActionModes() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
       setCustomSelectionActionModeCallback(null);
@@ -329,6 +368,7 @@ public class RichEditText extends EditText implements
     }
   }
 
+  @TargetApi(11)
   private void enableNativeActionModes() {
     EditorActionModeCallback.Native effectsMode=
         new EditorActionModeCallback.Native(
@@ -358,7 +398,10 @@ public class RichEditText extends EditText implements
                                             this, this);
 
     entryMode.addChain(R.id.cwac_richedittext_format, mainMode);
-    setCustomSelectionActionModeCallback(entryMode);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+      setCustomSelectionActionModeCallback(entryMode);
+    }
   }
 
   private void enableSherlockActionModes() {
