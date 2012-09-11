@@ -43,9 +43,13 @@ widgets to your layout as needed:
 At this time, there are no custom attributes used by
 `RichEditText`.
 
-On its own, by default, `RichEditText` does not actually provide
-any means for the user to apply various styles (e.g., boldface).
-To do that, you have two choices.
+On its own, by default, `RichEditText` provides one means of users
+applying formatting: the standard `<Ctrl>-<B>` for bold,
+`<Ctrl>-<I>` for italics, and `<Ctrl>-<U>` for underline work if there
+is a selection. You can disable this by calling
+`setKeyboardShortcutsEnabled(false)`.
+
+If you want an on-screen UI for formatting, you have two choices.
 
 First, you can call
 `enableActionModes()` on the `RichEditText`. This will add a "FORMAT"
@@ -57,10 +61,10 @@ effects. This is easy to set up, but there are two significant limitations:
 using ActionBarSherlock, and your activity hosting the `RichEditText` needs
 to inherit from one of the Sherlock-flavored activiy classes.
 
-2. The action modes do not work especially well on phones at this time &mdash;
-tablets work much better. To get it to work on phones at all, you will need
+2. The action modes work so-so on phones at this time &mdash;
+tablets work better. To get it to work on phones at all, you will need
 to include `android:imeOptions="flagNoExtractUi"` as an attribute on the
-`RichEditText`. Improving this... somehow... is a high-priority item.
+`RichEditText`.
 
 Alternatively, you can have
 your own toolbar or gesture interface or
@@ -114,12 +118,16 @@ packaged as JARs...)
 
 Version
 -------
-This is version v0.1 of this module, meaning it is really a n00b.
+This is version v0.2.0 of this module, meaning it is out of its months-long
+slumber and is proceeding apace.
 
 Demo
 ----
 In the `demo/` sub-project you will find
 a sample activity that demonstrates the use of `RichEditor`.
+
+In the `tests/` sub-project you will find a small unit test suite for
+exercising some of the effects.
 
 License
 -------
@@ -148,6 +156,7 @@ the fence may work, but it may not.
 
 Release Notes
 -------------
+- v0.2.0: added keyboard shortcuts for bold/italic/underline and test suite, bug fixes
 - v0.1.1: added `disableActionModes()` and fixed bug related to conditional action mode usage
 - v0.1: added action mode support using ActionBarSherlock for pre-Honeycomb devices
 - v0.0.3: removed `RichEditor`, replaced it with custom action modes
