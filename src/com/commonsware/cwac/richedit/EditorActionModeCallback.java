@@ -101,7 +101,7 @@ public class EditorActionModeCallback {
   }
 
   public static class ABS extends EditorActionModeCallback implements
-      com.actionbarsherlock.view.ActionMode.Callback {
+      ActionMode.Callback {
     Activity host=null;
 
     public ABS(Activity host, int menuResource, RichEditText editor,
@@ -111,9 +111,9 @@ public class EditorActionModeCallback {
     }
 
     @Override
-    public boolean onCreateActionMode(com.actionbarsherlock.view.ActionMode mode,
-                                      com.actionbarsherlock.view.Menu menu) {
-      com.actionbarsherlock.view.MenuInflater inflater=
+    public boolean onCreateActionMode(ActionMode mode,
+                                      Menu menu) {
+      MenuInflater inflater=
           mode.getMenuInflater();
 
       inflater.inflate(menuResource, menu);
@@ -123,8 +123,8 @@ public class EditorActionModeCallback {
     }
 
     @Override
-    public boolean onPrepareActionMode(com.actionbarsherlock.view.ActionMode mode,
-                                       com.actionbarsherlock.view.Menu menu) {
+    public boolean onPrepareActionMode(ActionMode mode,
+                                       Menu menu) {
       if (selection != null) {
         selection.apply(editor);
       }
@@ -133,13 +133,13 @@ public class EditorActionModeCallback {
     }
 
     @Override
-    public void onDestroyActionMode(com.actionbarsherlock.view.ActionMode mode) {
+    public void onDestroyActionMode(ActionMode mode) {
       listener.setIsShowing(false);
     }
 
     @Override
-    public boolean onActionItemClicked(com.actionbarsherlock.view.ActionMode mode,
-                                       com.actionbarsherlock.view.MenuItem item) {
+    public boolean onActionItemClicked(ActionMode mode,
+                                       MenuItem item) {
       EditorActionModeCallback next=chains.get(item.getItemId());
 
       if (next != null) {
@@ -154,7 +154,7 @@ public class EditorActionModeCallback {
           method=
               host.getClass()
                   .getMethod("startActionMode",
-                             com.actionbarsherlock.view.ActionMode.Callback.class);
+                             ActionMode.Callback.class);
           method.invoke(host, next);
         }
         catch (Exception e) {

@@ -26,6 +26,7 @@ import android.text.style.SuperscriptSpan;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.widget.EditText;
 import java.lang.reflect.Method;
@@ -66,7 +67,7 @@ public class RichEditText extends EditText implements
   private EditorActionModeCallback.Native mainMode=null;
   private EditorActionModeCallback.ABS sherlockEntryMode=null;
   private boolean forceActionMode=false;
-  private com.actionbarsherlock.view.ActionMode sherlockActionMode=null;
+  private ActionMode sherlockActionMode=null;
   private boolean keyboardShortcuts=true;
 
   /*
@@ -447,9 +448,9 @@ public class RichEditText extends EditText implements
         method=
             getContext().getClass()
                         .getMethod("startActionMode",
-                                   com.actionbarsherlock.view.ActionMode.Callback.class);
+                                   ActionMode.Callback.class);
         sherlockActionMode=
-            (com.actionbarsherlock.view.ActionMode)method.invoke(getContext(),
+            (ActionMode)method.invoke(getContext(),
                                                                  sherlockEntryMode);
       }
       catch (Exception e) {
